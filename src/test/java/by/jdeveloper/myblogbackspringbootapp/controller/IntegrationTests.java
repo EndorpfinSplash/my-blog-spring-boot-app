@@ -4,6 +4,8 @@ package by.jdeveloper.myblogbackspringbootapp.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockMultipartFile;
@@ -24,12 +26,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringJUnitConfig(classes = {
-        DataSourceConfiguration.class,
-        WebConfiguration.class,
+@SpringBootTest(
+        // Cоздаёт mock-версию веб-слоя, без запуска реального сервера
+        webEnvironment = SpringBootTest.WebEnvironment.MOCK
+)
+@TestPropertySource(properties = {
+        "spring.sql.init.mode=always",
+        "spring.sql.init.schema-locations=classpath:schema-test.sql"
 })
-@WebAppConfiguration
-@TestPropertySource(locations = "classpath:test-application.properties")
 class IntegrationTests {
 
     @Autowired

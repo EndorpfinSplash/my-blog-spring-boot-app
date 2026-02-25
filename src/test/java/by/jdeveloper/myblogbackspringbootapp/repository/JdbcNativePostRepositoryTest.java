@@ -7,6 +7,8 @@ import by.jdeveloper.myblogbackspringbootapp.model.Post;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.data.jdbc.test.autoconfigure.DataJdbcTest;
+import org.springframework.boot.jdbc.test.autoconfigure.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -19,11 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringJUnitConfig(classes = {
-        DataSourceConfiguration.class,
-        JdbcNativePostRepository.class}
-)
-@TestPropertySource(locations = "classpath:test-application.properties")
+@DataJdbcTest
 class JdbcNativePostRepositoryTest {
 
     public static final byte[] FILE_STUB = {(byte) 137, 80, 78, 71};
