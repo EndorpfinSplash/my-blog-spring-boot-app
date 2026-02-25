@@ -2,6 +2,7 @@ package by.jdeveloper.myblogbackspringbootapp.repository;
 
 
 import by.jdeveloper.myblogbackspringbootapp.dao.PostRepository;
+import by.jdeveloper.myblogbackspringbootapp.model.Comment;
 import by.jdeveloper.myblogbackspringbootapp.model.Post;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
