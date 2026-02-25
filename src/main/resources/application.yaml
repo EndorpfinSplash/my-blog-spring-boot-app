@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: my-blog-back-spring-boot-app
+  datasource:
+    url: jdbc:postgresql://localhost:5432/blog
+    username: postgres
+    password: postgres
