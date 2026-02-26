@@ -1,5 +1,7 @@
 package by.jdeveloper.myblogbackspringbootapp.repository;
 
+import by.jdeveloper.myblogbackspringbootapp.dao.CommentRepository;
+import by.jdeveloper.myblogbackspringbootapp.dao.FileRepository;
 import by.jdeveloper.myblogbackspringbootapp.dao.PostRepository;
 import by.jdeveloper.myblogbackspringbootapp.dto.NewCommentDto;
 import by.jdeveloper.myblogbackspringbootapp.model.Comment;
@@ -17,7 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Repository
-public class InnerPostRepository implements PostRepository {
+public class InnerRepository implements PostRepository, CommentRepository, FileRepository {
     static Long postCounter = 0L;
     static Long commentCounter = 0L;
     private final Map<Long, Post> postStorage = new HashMap<>();

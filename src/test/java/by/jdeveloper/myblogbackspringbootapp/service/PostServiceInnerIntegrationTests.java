@@ -1,20 +1,18 @@
-package by.jdeveloper.service;
+package by.jdeveloper.myblogbackspringbootapp.service;
 
 
-import by.jdeveloper.myblogbackspringbootapp.dao.PostRepository;
 import by.jdeveloper.myblogbackspringbootapp.dto.NewCommentDto;
 import by.jdeveloper.myblogbackspringbootapp.dto.NewPostDto;
 import by.jdeveloper.myblogbackspringbootapp.dto.PostUpdateDto;
 import by.jdeveloper.myblogbackspringbootapp.dto.PostsResponse;
+import by.jdeveloper.myblogbackspringbootapp.mapper.PostMapperImpl;
 import by.jdeveloper.myblogbackspringbootapp.model.Comment;
 import by.jdeveloper.myblogbackspringbootapp.model.Post;
-import by.jdeveloper.myblogbackspringbootapp.repository.InnerPostRepository;
-import by.jdeveloper.myblogbackspringbootapp.service.PostService;
+import by.jdeveloper.myblogbackspringbootapp.repository.InnerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
@@ -23,20 +21,22 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringJUnitConfig()
-@ActiveProfiles("integration-tests")
+@SpringBootTest(classes = {
+        InnerRepository.class,
+        PostMapperImpl.class,
+        PostService.class
+})
 class PostServiceInnerIntegrationTests {
 
     @Autowired
-    PostRepository postRepository;
+    private InnerRepository innerRepository;
 
     @Autowired
     PostService postService;
 
     @BeforeEach
     void initRepository() {
-        InnerPostRepository innerRepo = (InnerPostRepository) postRepository;
-        innerRepo.resetRepository();
+        innerRepository.resetRepository();
 
         NewPostDto newPostDto = NewPostDto.builder()
                 .title("zero title")
