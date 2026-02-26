@@ -50,10 +50,11 @@ public class PostService {
     }
 
     public Comment updateComment(Long id, Long commentId, NewCommentDto  newComment) {
-        Comment comment = commentRepository.findCommentByPostIdAndCommentId(id, commentId);
+        Long postId = newComment.getPostId();
+        Comment comment = commentRepository.findCommentByPostIdAndCommentId(postId, commentId);
 
         comment.setText(newComment.getText());
-        return commentRepository.updateComment(id, comment);
+        return commentRepository.updateComment(postId, comment);
     }
 
     public PostsResponse findPosts(String search,
