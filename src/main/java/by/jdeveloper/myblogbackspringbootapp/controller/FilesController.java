@@ -32,7 +32,6 @@ public class FilesController {
     public ResponseEntity<byte[]> downloadFile(@PathVariable(name = "id") Long postId) {
         byte[] file = filesService.downloadFile(postId);
 
-
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_PNG)
                 .header(HttpHeaders.CACHE_CONTROL, "no-store")
@@ -40,8 +39,8 @@ public class FilesController {
     }
 
     @PutMapping("/{id}/image")
-    public ResponseEntity uploadImage(@PathVariable(name = "id") Long postId,
-                                      @RequestParam("image") MultipartFile image) throws IOException {
+    public ResponseEntity<String> uploadImage(@PathVariable(name = "id") Long postId,
+                                              @RequestParam("image") MultipartFile image) throws IOException {
 
         if (postService.findById(postId) == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
