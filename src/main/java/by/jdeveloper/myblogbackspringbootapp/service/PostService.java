@@ -47,6 +47,13 @@ public class PostService {
         return postRepository.update(id, post);
     }
 
+    public Comment updateComment(Long id, Long commentId, NewCommentDto  newComment) {
+        Comment comment = postRepository.findCommentByPostIdAndCommentId(id, commentId);
+
+        comment.setText(newComment.getText());
+        return postRepository.updateComment(id, comment);
+    }
+
     public PostsResponse findPosts(String search,
                                    int pageNumber,
                                    int pageSize) {

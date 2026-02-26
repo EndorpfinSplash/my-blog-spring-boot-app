@@ -20,6 +20,8 @@ public interface PostRepository {
 
     Post update(Long id, Post post);
 
+    Comment updateComment(Long commentId, Comment comment);
+
     Optional<Post> findById(Long id);
 
     void deleteById(Long id);

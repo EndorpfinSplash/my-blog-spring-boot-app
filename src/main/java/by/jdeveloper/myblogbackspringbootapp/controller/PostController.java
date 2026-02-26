@@ -91,4 +91,12 @@ public class PostController {
             @RequestBody NewCommentDto newCommentDto) {
         return service.saveComment(postId, newCommentDto);
     }
+
+
+    @PutMapping(value = "/{id}/comments/{commentId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Comment updateComment(@PathVariable(name = "id") Long id,
+                                 @PathVariable(name = "commentId") Long commentId,
+                                 @RequestBody NewCommentDto commentUpdated) {
+        return service.updateComment(id, commentId, commentUpdated);
+    }
 }
