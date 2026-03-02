@@ -2,14 +2,10 @@ package by.jdeveloper.myblogbackspringbootapp.repository;
 
 
 import by.jdeveloper.myblogbackspringbootapp.dao.PostRepository;
-import by.jdeveloper.myblogbackspringbootapp.dto.NewCommentDto;
-import by.jdeveloper.myblogbackspringbootapp.model.Comment;
 import by.jdeveloper.myblogbackspringbootapp.model.Post;
 import lombok.AllArgsConstructor;
-
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -21,7 +17,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,6 +47,7 @@ public class JdbcNativePostRepository implements PostRepository {
                             .text(rs.getString("text"))
                             .tags(tags)
                             .likesCount(rs.getLong("likes_count"))
+                            .commentsCount(rs.getLong("comments_count"))
                             .build();
                 },
                 "%" + search + "%"
@@ -105,6 +101,7 @@ public class JdbcNativePostRepository implements PostRepository {
                             .text(rs.getString("text"))
                             .tags(tags)
                             .likesCount(rs.getLong("likes_count"))
+                            .commentsCount(rs.getLong("comments_count"))
                             .build();
                 },
                 tag
@@ -136,31 +133,6 @@ public class JdbcNativePostRepository implements PostRepository {
             post.setId(key.longValue());
         }
         return post;
-    }
-
-    @Override
-    public Comment save(Long postId, NewCommentDto newCommentDto) {
-        Comment comment = new Comment();
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-
-        jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO comment(text, post_id) VALUES (?, ?)",
-                    new String[]{"id"}
-            );
-            ps.setString(1, newCommentDto.getText());
-            ps.setLong(2, postId);
-
-            return ps;
-        }, keyHolder);
-
-        Number key = keyHolder.getKey();
-        if (key != null) {
-            comment.setId(key.longValue());
-            comment.setText(newCommentDto.getText());
-            comment.setPostId(postId);
-        }
-        return comment;
     }
 
     @Override
@@ -229,43 +201,9 @@ public class JdbcNativePostRepository implements PostRepository {
     }
 
     @Override
-    public List<Comment> findAllCommentsByPostId(Long postId) {
-        String sql = """
-                select c.id, c.text, c.post_id
-                from comment c
-                where c.post_id = ?
-                """;
-        try {
-            return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Comment.class), postId);
-        } catch (EmptyResultDataAccessException e) {
-            return Collections.emptyList();
-        }
-    }
-
-    @Override
     public Long likesIncrease(Long postId) {
         jdbcTemplate.update("update post set likes_count = likes_count + 1 where id = ?", postId);
         return jdbcTemplate.queryForObject("select likes_count from post where id = ?", Long.class, postId);
-    }
-
-    @Override
-    public Comment findCommentByPostIdAndCommentId(Long postId, Long commentId) {
-        String sql = """
-                select c.id, c.text, c.post_id
-                from comment c
-                where c.post_id = ? and c.id = ?
-                """;
-
-        return jdbcTemplate.queryForObject(
-                sql,
-                (rs, rowNum) -> Comment.builder()
-                        .id(rs.getLong("id"))
-                        .text(rs.getString("text"))
-                        .postId(rs.getLong("post_id"))
-                        .build(),
-                postId,
-                commentId
-        );
     }
 
     @Override
@@ -275,36 +213,6 @@ public class JdbcNativePostRepository implements PostRepository {
                 commentId,
                 postId
         );
-    }
-
-    @Override
-    public void saveFile(Long postId, String fileName, byte[] data) {
-        jdbcTemplate.update(
-                "insert into image (post_id, file_name, data) values (?, ?, ?)",
-                postId, fileName, data);
-    }
-
-    public boolean updateFileByPostId(Long postId, String fileName, byte[] data) {
-        try {
-            jdbcTemplate.update(
-                    "update image set file_name= ?, data = ? where post_id= ?",
-                    fileName, data, postId);
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public byte[] getFileByPostId(Long postId) {
-        String sql = "SELECT data FROM image WHERE post_id = ?";
-        return jdbcTemplate.queryForObject(sql, byte[].class, postId);
-    }
-
-    @Override
-    public Long countFilesByPostId(Long postId) {
-        String sql = "SELECT count(*) FROM image WHERE post_id = ?";
-        return jdbcTemplate.queryForObject(sql, Long.class, postId);
     }
 
 }

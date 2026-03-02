@@ -1,14 +1,17 @@
 package by.jdeveloper.myblogbackspringbootapp.repository;
 
 
+import by.jdeveloper.myblogbackspringbootapp.dao.CommentRepository;
+import by.jdeveloper.myblogbackspringbootapp.dao.FileRepository;
 import by.jdeveloper.myblogbackspringbootapp.dao.PostRepository;
+import by.jdeveloper.myblogbackspringbootapp.model.Comment;
 import by.jdeveloper.myblogbackspringbootapp.model.Post;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.data.jdbc.test.autoconfigure.DataJdbcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.util.Collection;
 import java.util.List;
@@ -18,12 +21,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringJUnitConfig(classes = {
-        DataSourceConfiguration.class,
-        JdbcNativePostRepository.class}
-)
-@TestPropertySource(locations = "classpath:test-application.properties")
-class JdbcNativePostRepositoryTest {
+@DataJdbcTest
+@Import({
+        JdbcNativePostRepository.class,
+        JdbcNativeCommentRepository.class,
+        JdbcNativeFileRepository.class
+})
+class JdbcRepositoriesTest {
 
     public static final byte[] FILE_STUB = {(byte) 137, 80, 78, 71};
     @Autowired
@@ -31,6 +35,12 @@ class JdbcNativePostRepositoryTest {
 
     @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
+    private FileRepository fileRepository;
 
     @BeforeEach
     void setUp() {
@@ -178,7 +188,7 @@ class JdbcNativePostRepositoryTest {
 
     @Test
     void findAllCommentsByPostId() {
-        List<Comment> allCommentsByPostId = postRepository.findAllCommentsByPostId(1L);
+        List<Comment> allCommentsByPostId = commentRepository.findAllCommentsByPostId(1L);
         assertEquals(2, allCommentsByPostId.size());
         assertEquals("Comment text for post", allCommentsByPostId.getFirst().getText());
     }
@@ -192,7 +202,7 @@ class JdbcNativePostRepositoryTest {
 
     @Test
     void findCommentByPostIdAndCommentId() {
-        Comment comment = postRepository.findCommentByPostIdAndCommentId(1L, 2L);
+        Comment comment = commentRepository.findCommentByPostIdAndCommentId(1L, 2L);
 
         assertEquals(2L, comment.getId());
         assertEquals(1L, comment.getPostId());
@@ -203,7 +213,7 @@ class JdbcNativePostRepositoryTest {
     void deleteByPostIdAndCommentId() {
         postRepository.deleteByPostIdAndCommentId(1L, 2L);
 
-        List<Comment> allComments = postRepository.findAllCommentsByPostId(1L);
+        List<Comment> allComments = commentRepository.findAllCommentsByPostId(1L);
         assertEquals(1, allComments.size());
         assertTrue(allComments.stream().noneMatch(comment -> comment.getId().equals(2L)));
     }
@@ -211,35 +221,34 @@ class JdbcNativePostRepositoryTest {
     @Test
     void saveFile() {
         byte[] fileStub = new byte[]{(byte) 137, 80, 78, 71};
-        postRepository.saveFile(2L, "test_name", fileStub);
+        fileRepository.saveFile(2L, "test_name", fileStub);
 
-        byte[] savedFile = postRepository.getFileByPostId(2L);
-        assertArrayEquals(fileStub,savedFile);
-//        assertEquals("test file", );
+        byte[] savedFile = fileRepository.getFileByPostId(2L);
+        assertArrayEquals(fileStub, savedFile);
     }
 
     @Test
     void updateFileByPostId() {
-        byte[] newFile =new byte[]{(byte) 147, 90, 88, 81};
-        boolean isUpdated = postRepository.updateFileByPostId(1L, "updated_file_name", newFile);
+        byte[] newFile = new byte[]{(byte) 147, 90, 88, 81};
+        boolean isUpdated = fileRepository.updateFileByPostId(1L, "updated_file_name", newFile);
 
-        byte[] updatedFile = postRepository.getFileByPostId(1L);
+        byte[] updatedFile = fileRepository.getFileByPostId(1L);
         assertTrue(isUpdated);
         assertArrayEquals(newFile, updatedFile);
     }
 
     @Test
     void getFileByPostId() {
-        byte[] originFile = postRepository.getFileByPostId(1L);
+        byte[] originFile = fileRepository.getFileByPostId(1L);
 
         assertArrayEquals(FILE_STUB, originFile);
     }
 
     @Test
     void countFilesByPostId() {
-        Long filesQuantityPost1 = postRepository.countFilesByPostId(1L);
+        Long filesQuantityPost1 = fileRepository.countFilesByPostId(1L);
         assertEquals(1, filesQuantityPost1);
-        Long filesQuantityPost2 = postRepository.countFilesByPostId(2L);
+        Long filesQuantityPost2 = fileRepository.countFilesByPostId(2L);
         assertEquals(0, filesQuantityPost2);
     }
 }

@@ -1,6 +1,7 @@
 package by.jdeveloper.myblogbackspringbootapp.service;
 
 
+import by.jdeveloper.myblogbackspringbootapp.dao.CommentRepository;
 import by.jdeveloper.myblogbackspringbootapp.dao.PostRepository;
 import by.jdeveloper.myblogbackspringbootapp.dto.NewCommentDto;
 import by.jdeveloper.myblogbackspringbootapp.dto.NewPostDto;
@@ -21,6 +22,7 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
     private final PostMapper postMapper;
 
     public Post save(NewPostDto newPostDto) {
@@ -29,7 +31,7 @@ public class PostService {
     }
 
     public Comment saveComment(Long postId, NewCommentDto newCommentDto) {
-        return postRepository.save(postId, newCommentDto);
+        return commentRepository.save(postId, newCommentDto);
     }
 
     public void deleteById(Long id) {
@@ -45,6 +47,14 @@ public class PostService {
         post.setTags(postUpdated.getTags());
 
         return postRepository.update(id, post);
+    }
+
+    public Comment updateComment(Long id, Long commentId, NewCommentDto  newComment) {
+        Long postId = newComment.getPostId();
+        Comment comment = commentRepository.findCommentByPostIdAndCommentId(postId, commentId);
+
+        comment.setText(newComment.getText());
+        return commentRepository.updateComment(postId, comment);
     }
 
     public PostsResponse findPosts(String search,
@@ -99,12 +109,12 @@ public class PostService {
 
     public List<Comment> getCommentsByPostId(String postId) {
         long postIdParsed = getPostIdParsed(postId);
-        return postRepository.findAllCommentsByPostId(postIdParsed);
+        return commentRepository.findAllCommentsByPostId(postIdParsed);
     }
 
     public Comment getCommentsByPostIdAndCommentId(String postId, Long commentId) {
         long postIdParsed = getPostIdParsed(postId);
-        return postRepository.findCommentByPostIdAndCommentId(postIdParsed, commentId);
+        return commentRepository.findCommentByPostIdAndCommentId(postIdParsed, commentId);
     }
 
     public void deleteByPostIdAndCommentId(Long postId, Long commentId) {

@@ -11,6 +11,7 @@ import by.jdeveloper.myblogbackspringbootapp.service.PostService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost")
 @RequestMapping("/api/posts")
 @AllArgsConstructor
 public class PostController {
@@ -90,5 +92,13 @@ public class PostController {
             @PathVariable("id") Long postId,
             @RequestBody NewCommentDto newCommentDto) {
         return service.saveComment(postId, newCommentDto);
+    }
+
+
+    @PutMapping(value = "/{id}/comments/{commentId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Comment updateComment(@PathVariable(name = "id") Long id,
+                                 @PathVariable(name = "commentId") Long commentId,
+                                 @RequestBody NewCommentDto commentUpdated) {
+        return service.updateComment(id, commentId, commentUpdated);
     }
 }

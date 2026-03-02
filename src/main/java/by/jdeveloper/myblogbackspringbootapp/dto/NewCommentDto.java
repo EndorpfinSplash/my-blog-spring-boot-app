@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class NewCommentDto {
-    private String text;
+    private Long id;
     private Long postId;
+    private String text;
 }

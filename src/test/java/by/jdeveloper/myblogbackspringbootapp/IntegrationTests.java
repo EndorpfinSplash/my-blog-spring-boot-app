@@ -1,15 +1,14 @@
-package by.jdeveloper.myblogbackspringbootapp.controller;
+package by.jdeveloper.myblogbackspringbootapp;
 
 
+import jdk.jfr.Description;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -24,12 +23,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringJUnitConfig(classes = {
-        DataSourceConfiguration.class,
-        WebConfiguration.class,
-})
-@WebAppConfiguration
-@TestPropertySource(locations = "classpath:test-application.properties")
+@SpringBootTest(
+        // Cоздаёт mock-версию веб-слоя, без запуска реального сервера
+        webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+        properties = {
+                "spring.sql.init.mode=always",
+                "spring.sql.init.schema-locations=classpath:schema-test.sql"
+        }
+)
 class IntegrationTests {
 
     @Autowired
@@ -68,6 +69,11 @@ class IntegrationTests {
                     ps.setInt(4, 0);
                 }
         );
+    }
+
+    @Test
+    @Description("Failed to load context")
+    void contextLoads() {
     }
 
     @Test

@@ -1,5 +1,7 @@
 package by.jdeveloper.myblogbackspringbootapp.repository;
 
+import by.jdeveloper.myblogbackspringbootapp.dao.CommentRepository;
+import by.jdeveloper.myblogbackspringbootapp.dao.FileRepository;
 import by.jdeveloper.myblogbackspringbootapp.dao.PostRepository;
 import by.jdeveloper.myblogbackspringbootapp.dto.NewCommentDto;
 import by.jdeveloper.myblogbackspringbootapp.model.Comment;
@@ -17,7 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Repository
-public class InnerPostRepository implements PostRepository {
+public class InnerRepository implements PostRepository, CommentRepository, FileRepository {
     static Long postCounter = 0L;
     static Long commentCounter = 0L;
     private final Map<Long, Post> postStorage = new HashMap<>();
@@ -33,7 +35,9 @@ public class InnerPostRepository implements PostRepository {
 
     @Override
     public List<Post> getAll() {
-        return postStorage.values().stream().toList();
+        return postStorage.values()
+                .stream()
+                .toList();
     }
 
     @Override
@@ -60,6 +64,14 @@ public class InnerPostRepository implements PostRepository {
     }
 
     @Override
+    public Comment updateComment(Long commentId, Comment newComment) {
+        Comment comment = commentStorage.get(newComment.getPostId()).get(commentId);
+        comment.setText(newComment.getText());
+        return comment;
+    }
+
+
+    @Override
     public Optional<Post> findById(Long id) {
         Post post = postStorage.get(id);
         return post == null ? Optional.empty() : Optional.of(post);
@@ -68,6 +80,8 @@ public class InnerPostRepository implements PostRepository {
     @Override
     public void deleteById(Long id) {
         postStorage.remove(id);
+        commentStorage.remove(id);
+        imageStorage.remove(id);
     }
 
     @Override
@@ -80,7 +94,7 @@ public class InnerPostRepository implements PostRepository {
 
     @Override
     public List<Comment> findAllCommentsByPostId(Long postId) {
-        return List.of();
+        return commentStorage.get(postId).values().stream().toList();
     }
 
     @Override
